@@ -176,6 +176,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.16"
+  transformable_list_view:
+    dependency: "direct main"
+    description:
+      name: transformable_list_view
+      sha256: "61223310548512bd7b189b036ff53f9f8e5d0ebe85ea2747903361965c71e40d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0"
   vector_math:
     dependency: transitive
     description:
@@ -186,3 +194,4 @@ packages:
     version: "2.1.4"
 sdks:
   dart: ">=2.19.0 <4.0.0"
+  flutter: ">=1.17.0"
