@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:podcato/blocs/detail_podcast/detail_podcast_bloc.dart';
 import 'package:podcato/blocs/podcast_search/podcast_search_bloc.dart';
 import 'package:podcato/blocs/podcast_trending/podcast_trending_bloc.dart';
 import 'package:podcato/providers/api_provider.dart';
 import 'package:podcato/repositories/main_repository.dart';
-import 'package:podcato/screens/search_page.dart';
+import 'package:podcato/routers/main_router.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,20 +29,25 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MultiBlocProvider(
-          providers: [
-            BlocProvider<PodcastSearchBloc>(
-              create: (context) => PodcastSearchBloc(),
-            ),
-            BlocProvider<PodcastTrendingBloc>(
-              create: (context) => PodcastTrendingBloc(),
-            ),
-          ],
-          child: MaterialApp(
-              title: 'Moodly',
-              theme: ThemeData(
-                primarySwatch: Colors.blue,
-              ),
-              home: const SearchPage())),
+        providers: [
+          BlocProvider<PodcastSearchBloc>(
+            create: (context) => PodcastSearchBloc(),
+          ),
+          BlocProvider<PodcastTrendingBloc>(
+            create: (context) => PodcastTrendingBloc(),
+          ),
+          BlocProvider<DetailPodcastBloc>(
+            create: (context) => DetailPodcastBloc(),
+          ),
+        ],
+        child: MaterialApp(
+          title: 'Moodly',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          onGenerateRoute: MainRouter.generateRoute,
+        ),
+      ),
     );
   }
 }

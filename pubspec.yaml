@@ -44,6 +44,8 @@ dependencies:
   cached_network_image: any
   convert: any
   crypto: any
+  shimmer: ^2.0.0
+  uuid: ^3.0.7
 
 dev_dependencies:
   flutter_test:
