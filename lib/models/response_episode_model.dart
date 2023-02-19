@@ -1,12 +1,9 @@
 class ResponseEpisodeModel {
   String? status;
   List<Items>? items;
-  int? count;
-  int? query;
   String? description;
 
-  ResponseEpisodeModel(
-      {this.status, this.items, this.count, this.query, this.description});
+  ResponseEpisodeModel({this.status, this.items, this.description});
 
   ResponseEpisodeModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
@@ -16,8 +13,6 @@ class ResponseEpisodeModel {
         items!.add(Items.fromJson(v));
       });
     }
-    count = json['count'];
-    query = json['query'];
     description = json['description'];
   }
 
@@ -27,8 +22,6 @@ class ResponseEpisodeModel {
     if (items != null) {
       data['items'] = items!.map((v) => v.toJson()).toList();
     }
-    data['count'] = count;
-    data['query'] = query;
     data['description'] = description;
     return data;
   }

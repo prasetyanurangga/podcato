@@ -23,11 +23,9 @@ class PodcastTrendingBloc
           emit(
               PodcastTrendingSuccess(data: finalResponse.feeds as List<Feeds>));
         } else {
-          print(response.message);
           emit(PodcastTrendingFailure(error: response.message ?? "Error"));
         }
       } catch (error) {
-        print(error);
         emit(PodcastTrendingFailure(error: error.toString()));
       }
     });

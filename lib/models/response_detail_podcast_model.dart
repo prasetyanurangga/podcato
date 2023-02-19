@@ -1,15 +1,12 @@
 class ResponseDetailPodcastModel {
   String? status;
-  Query? query;
   Feed? feed;
   String? description;
 
-  ResponseDetailPodcastModel(
-      {this.status, this.query, this.feed, this.description});
+  ResponseDetailPodcastModel({this.status, this.feed, this.description});
 
   ResponseDetailPodcastModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
-    query = json['query'] != null ? Query.fromJson(json['query']) : null;
     feed = json['feed'] != null ? Feed.fromJson(json['feed']) : null;
     description = json['description'];
   }
@@ -17,9 +14,6 @@ class ResponseDetailPodcastModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['status'] = status;
-    if (query != null) {
-      data['query'] = query!.toJson();
-    }
     if (feed != null) {
       data['feed'] = feed!.toJson();
     }
@@ -146,7 +140,7 @@ class Feed {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['podcastGuid'] = podcastGuid;
     data['title'] = title;

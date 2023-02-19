@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:podcato/audio_services/page_manager.dart';
+import 'package:podcato/audio_services/services/service_locator.dart';
 import 'package:podcato/blocs/detail_podcast/detail_podcast_bloc.dart';
 import 'package:podcato/blocs/podcast_search/podcast_search_bloc.dart';
 import 'package:podcato/blocs/podcast_trending/podcast_trending_bloc.dart';
@@ -7,14 +9,26 @@ import 'package:podcato/providers/api_provider.dart';
 import 'package:podcato/repositories/main_repository.dart';
 import 'package:podcato/routers/main_router.dart';
 
-void main() {
+Future<void> main() async {
+  await setupServiceLocator();
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void dispose() {
+    getIt<PageManager>().dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(

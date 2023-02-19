@@ -66,11 +66,11 @@ class ApiProvider {
   }
 
   Future<Response> getDetailPodcast(String id) async {
-    String endpoint = "/podcasts/byguid";
+    String endpoint = "/podcasts/byfeedid";
     Response response;
 
     try {
-      response = await getDio().get(endpoint, queryParameters: {'guid': id});
+      response = await getDio().get(endpoint, queryParameters: {'id': id});
     } on Error catch (e) {
       throw Exception('Failed to load post $e');
     }
@@ -78,11 +78,11 @@ class ApiProvider {
   }
 
   Future<Response> getDetailEpisode(String id) async {
-    String endpoint = "/episodes/bypodcastguid";
+    String endpoint = "/episodes/byfeedid";
     Response response;
 
     try {
-      response = await getDio().get(endpoint, queryParameters: {'guid': id});
+      response = await getDio().get(endpoint, queryParameters: {'id': id});
     } on Error catch (e) {
       throw Exception('Failed to load post $e');
     }

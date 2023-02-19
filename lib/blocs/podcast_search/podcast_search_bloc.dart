@@ -21,11 +21,9 @@ class PodcastSearchBloc extends Bloc<PodcastSearchEvent, PodcastSearchState> {
         if (response.status == Status.Success) {
           emit(PodcastSearchSuccess(data: finalResponse.feeds as List<Feeds>));
         } else {
-          print(response.message);
           emit(PodcastSearchFailure(error: response.message ?? "Error"));
         }
       } catch (error) {
-        print(error);
         emit(PodcastSearchFailure(error: error.toString()));
       }
     });
