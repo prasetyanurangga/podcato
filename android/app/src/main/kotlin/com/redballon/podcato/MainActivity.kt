@@ -1,4 +1,4 @@
-package com.example.podcato
+package com.redballon.podcato
 
 import io.flutter.embedding.android.FlutterActivity
 

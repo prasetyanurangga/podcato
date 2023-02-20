@@ -1,15 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:podcato/audio_services/page_manager.dart';
 import 'package:podcato/audio_services/services/service_locator.dart';
 import 'package:podcato/blocs/detail_podcast/detail_podcast_bloc.dart';
 import 'package:podcato/blocs/detail_podcast/detail_podcast_state.dart';
+import 'package:podcato/models/response_episode_model.dart';
 import 'package:podcato/models/response_podcasts_model.dart';
-import 'package:podcato/routers/main_router.dart';
 import 'package:podcato/wrappers/stack_player_wrapper.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:transformable_list_view/transformable_list_view.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 class DetailPodcastPage extends StatefulWidget {
@@ -31,6 +33,7 @@ class _DetailPodcastPageState extends State<DetailPodcastPage> {
 
   late PageManager pageManager;
   int currentIndex = 0;
+  String query = "";
 
   @override
   void initState() {
@@ -64,6 +67,23 @@ class _DetailPodcastPageState extends State<DetailPodcastPage> {
     return paintTransform;
   }
 
+  String completeUrl(String url) {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    } else {
+      return 'https://$url';
+    }
+  }
+
+  Future<void> _launchUrl(String url) async {
+    if (!await launchUrl(Uri.parse(completeUrl(url)))) {
+      const snackBar = SnackBar(
+        content: Text('Cannot Open URL'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
   String formatedTime(int timeInSecond) {
     if (timeInSecond > 3600) {
       int sec = timeInSecond % 60;
@@ -71,11 +91,12 @@ class _DetailPodcastPageState extends State<DetailPodcastPage> {
       int min = tempMen % 60;
 
       int hr = ((tempMen - min) / 60).floor();
-      return "$hr jam $min menit $sec detik";
-    } else {
-      int sec = timeInSecond % 60;
+      return "$hr jam";
+    } else if (timeInSecond >= 60) {
       int min = (timeInSecond / 60).floor();
-      return "$min menit $sec detik";
+      return "$min menit";
+    } else {
+      return "$timeInSecond detik";
     }
   }
 
@@ -97,6 +118,16 @@ class _DetailPodcastPageState extends State<DetailPodcastPage> {
       String second = sec > 10 ? "$sec" : "0$sec";
       return "$minute:$second";
     }
+  }
+
+  List<Items> getEpisodeWithQuery(List<Items> items) {
+    return items
+        .where((element) =>
+            (element.title ?? "").toLowerCase().contains(query.toLowerCase()) ||
+            (element.description ?? "")
+                .toLowerCase()
+                .contains(query.toLowerCase()))
+        .toList();
   }
 
   String podcastName() {
@@ -134,9 +165,9 @@ class _DetailPodcastPageState extends State<DetailPodcastPage> {
                         style: const TextStyle(fontSize: 15),
                       ),
                       IconButton(
-                        onPressed: () => {Navigator.pop(context)},
+                        onPressed: () => _launchUrl(widget.detail.link ?? ""),
                         icon: const Icon(
-                          Icons.share,
+                          Icons.open_in_new_rounded,
                         ),
                       ),
                     ],
@@ -285,16 +316,55 @@ class _DetailPodcastPageState extends State<DetailPodcastPage> {
                 ),
                 Container(
                   padding: const EdgeInsets.only(bottom: 16),
-                  child: const Text(
-                    "Episodes",
-                    style: TextStyle(fontSize: 24),
+                  child: Row(
+                    children: [
+                      const Text(
+                        "Episodes",
+                        style: TextStyle(fontSize: 24),
+                      ),
+                      const SizedBox(
+                        width: 16,
+                      ),
+                      Expanded(
+                        child: TextField(
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide: BorderSide.none),
+                            filled: true,
+                            hintStyle: const TextStyle(fontSize: 12),
+                            hintText: 'Search episode',
+                            focusColor: Colors.black,
+                            suffixIcon: const Icon(Icons.search),
+                            fillColor: const Color.fromARGB(255, 237, 236, 236),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                          ),
+                          textInputAction: TextInputAction.search,
+                          onChanged: (value) {
+                            if (value == "") {
+                              setState(() {
+                                query = "";
+                              });
+                            }
+                          },
+                          onSubmitted: (value) {
+                            if (value != "") {
+                              setState(() {
+                                query = value;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Container(
                   child: BlocBuilder<DetailPodcastBloc, DetailPodcastState>(
                     builder: (context, state) {
                       if (state is DetailPodcastSuccess) {
-                        final resFeed = state.episodes;
+                        final resFeed = getEpisodeWithQuery(state.episodes);
                         return Column(
                           children: List.generate(
                             resFeed.length,
@@ -333,8 +403,8 @@ class _DetailPodcastPageState extends State<DetailPodcastPage> {
                                               imageUrl:
                                                   resFeed[index].feedImage ??
                                                       "",
-                                              width: 100,
-                                              height: 100,
+                                              width: 80,
+                                              height: 80,
                                               fit: BoxFit.cover,
                                               placeholder: (context, url) =>
                                                   Shimmer.fromColors(
@@ -370,30 +440,6 @@ class _DetailPodcastPageState extends State<DetailPodcastPage> {
                                               ),
                                             ),
                                           ),
-                                          Center(
-                                            child: RawMaterialButton(
-                                              onPressed: () {
-                                                if (pageManager
-                                                        .currentSongNotifier
-                                                        .value
-                                                        .id !=
-                                                    resFeed[index]
-                                                        .enclosureUrl) {
-                                                  getIt<PageManager>().init(
-                                                      resFeed, index, uuid);
-                                                }
-                                              },
-                                              elevation: 2.0,
-                                              fillColor:
-                                                  Colors.white.withOpacity(0.8),
-                                              padding:
-                                                  const EdgeInsets.all(12.0),
-                                              shape: const CircleBorder(),
-                                              child: const Icon(
-                                                Icons.play_arrow_rounded,
-                                              ),
-                                            ),
-                                          )
                                         ],
                                       ),
                                     ),
@@ -401,20 +447,13 @@ class _DetailPodcastPageState extends State<DetailPodcastPage> {
                                     Expanded(
                                       child: GestureDetector(
                                         onTap: () async {
-                                          final resultIndex =
-                                              await Navigator.pushNamed(context,
-                                                  '/detail_episode',
-                                                  arguments:
-                                                      DetailEpisodeArgument(
-                                                          resFeed[index]
-                                                                  .enclosureUrl ??
-                                                              "",
-                                                          resFeed,
-                                                          uuid,
-                                                          index));
-                                          setState(() {
-                                            currentIndex = resultIndex as int;
-                                          });
+                                          if (pageManager.currentSongNotifier
+                                                  .value.id !=
+                                              resFeed[index].enclosureUrl) {
+                                            getIt<PageManager>()
+                                                .init(resFeed, index, uuid);
+                                            getIt<PageManager>().play();
+                                          }
                                         },
                                         child: Column(
                                           crossAxisAlignment:
@@ -452,6 +491,33 @@ class _DetailPodcastPageState extends State<DetailPodcastPage> {
                                                   width: 4,
                                                 ),
                                                 Text(
+                                                  DateFormat(
+                                                          "d MMM yy", "id_ID")
+                                                      .format(resFeed[index]
+                                                                  .datePublished !=
+                                                              null
+                                                          ? DateTime
+                                                              .fromMillisecondsSinceEpoch(
+                                                                  resFeed[index]
+                                                                          .datePublished! *
+                                                                      1000)
+                                                          : DateTime.now()),
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      fontSize: 12),
+                                                ),
+                                                const SizedBox(
+                                                  width: 4,
+                                                ),
+                                                const Icon(
+                                                  Icons.circle,
+                                                  size: 4,
+                                                ),
+                                                const SizedBox(
+                                                  width: 4,
+                                                ),
+                                                Text(
                                                   formatedTime(
                                                       resFeed[index].duration ??
                                                           0),
@@ -461,7 +527,7 @@ class _DetailPodcastPageState extends State<DetailPodcastPage> {
                                                       fontSize: 12),
                                                 ),
                                               ],
-                                            )
+                                            ),
                                           ],
                                         ),
                                       ),

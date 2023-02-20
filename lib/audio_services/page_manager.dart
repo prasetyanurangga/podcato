@@ -26,16 +26,14 @@ class PageManager {
 
   // Events: Calls coming from the UI
   void init(List<Items> episodes, int index, String id) async {
-    await _loadPlaylist(episodes, index, id);
-    _listenToChangesInPlaylist();
+    await loadPlaylist(episodes, index, id);
     _listenToPlaybackState();
     _listenToCurrentPosition();
     _listenToBufferedPosition();
     _listenToTotalDuration();
-    _listenToChangesInSong();
   }
 
-  Future<void> _loadPlaylist(List<Items> episodes, int index, String id) async {
+  Future<void> loadPlaylist(List<Items> episodes, int index, String id) async {
     Items tempEpisodes = episodes[index];
     bunchOfListItems = episodes;
 
@@ -55,21 +53,7 @@ class PageManager {
 
     currentSongNotifier.value = currentMediaItem;
 
-    final mediaItems = [currentMediaItem];
-    await _audioHandler.addQueueItems(mediaItems);
-  }
-
-  void _listenToChangesInPlaylist() {
-    _audioHandler.queue.listen((playlist) {
-      if (playlist.isEmpty) {
-        playlistNotifier.value = [];
-        currentSongNotifier.value = playlist[0];
-      } else {
-        final newList = playlist.map((item) => item.title).toList();
-        playlistNotifier.value = newList;
-      }
-      _updateSkipButtons();
-    });
+    await _audioHandler.addQueueItems([currentMediaItem]);
   }
 
   void _listenToPlaybackState() {
@@ -122,13 +106,6 @@ class PageManager {
     });
   }
 
-  void _listenToChangesInSong() {
-    _audioHandler.mediaItem.listen((mediaItem) {
-      currentSongNotifier.value = mediaItem ?? {} as MediaItem;
-      _updateSkipButtons();
-    });
-  }
-
   void _updateSkipButtons() {
     final mediaItem = _audioHandler.mediaItem.value;
     final playlist = _audioHandler.queue.value;
@@ -158,13 +135,13 @@ class PageManager {
 
   Future<void> previous(int index, String id) async {
     _audioHandler.pause();
-    await _loadPlaylist(bunchOfListItems, index - 1, id);
+    await loadPlaylist(bunchOfListItems, index - 1, id);
     currentSongIndex.value = index - 1;
   }
 
   Future<void> next(int index, String id) async {
     _audioHandler.pause();
-    await _loadPlaylist(bunchOfListItems, index + 1, id);
+    await loadPlaylist(bunchOfListItems, index + 1, id);
     currentSongIndex.value = index + 1;
   }
 

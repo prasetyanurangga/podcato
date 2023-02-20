@@ -7,6 +7,7 @@ import 'package:podcato/audio_services/page_manager.dart';
 import 'package:podcato/audio_services/services/service_locator.dart';
 import 'package:podcato/models/response_episode_model.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DetailEpisodePage extends StatefulWidget {
   final String id;
@@ -33,6 +34,7 @@ class _DetailEpisodePageState extends State<DetailEpisodePage> {
     // getIt<PageManager>().clearQueue();
     if (pageManager.currentSongNotifier.value.id != widget.id) {
       getIt<PageManager>().init(widget.listEpisode, widget.index, widget.uuid);
+      getIt<PageManager>().play();
     }
     super.initState();
   }
@@ -42,6 +44,23 @@ class _DetailEpisodePageState extends State<DetailEpisodePage> {
       return widget.listEpisode[index].title ?? "";
     }
     return "";
+  }
+
+  String completeUrl(String url) {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    } else {
+      return 'https://$url';
+    }
+  }
+
+  Future<void> _launchUrl(String url) async {
+    if (!await launchUrl(Uri.parse(completeUrl(url)))) {
+      const snackBar = SnackBar(
+        content: Text('Cannot Open URL'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
   }
 
   Widget _buildBody() {
@@ -73,9 +92,10 @@ class _DetailEpisodePageState extends State<DetailEpisodePage> {
                     style: TextStyle(fontSize: 15),
                   )),
                   IconButton(
-                    onPressed: () => {Navigator.pop(context)},
+                    onPressed: () =>
+                        _launchUrl(widget.listEpisode[widget.index].link ?? ""),
                     icon: const Icon(
-                      Icons.share,
+                      Icons.open_in_new_rounded,
                     ),
                   ),
                 ],

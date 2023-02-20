@@ -1,5 +1,7 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:podcato/audio_services/page_manager.dart';
+import 'package:podcato/audio_services/services/service_locator.dart';
 
 Future<AudioHandler> initAudioService() async {
   return await AudioService.init(
@@ -163,10 +165,22 @@ class MyAudioHandler extends BaseAudioHandler {
   Future<void> seek(Duration position) => _player.seek(position);
 
   @override
-  Future<void> skipToNext() => _player.seekToNext();
+  Future<void> skipToNext() async {
+    PageManager pageManager = getIt<PageManager>();
+    print(pageManager.currentSongIndex);
+    print(pageManager.bunchOfListItems);
+    await pageManager.loadPlaylist(pageManager.bunchOfListItems,
+        pageManager.currentSongIndex.value + 1, "");
+    pageManager.currentSongIndex.value = pageManager.currentSongIndex.value + 1;
+  }
 
   @override
-  Future<void> skipToPrevious() => _player.seekToPrevious();
+  Future<void> skipToPrevious() async {
+    PageManager pageManager = getIt<PageManager>();
+    await pageManager.loadPlaylist(pageManager.bunchOfListItems,
+        pageManager.currentSongIndex.value - 1, "");
+    pageManager.currentSongIndex.value = pageManager.currentSongIndex.value - 1;
+  }
 
   @override
   Future<void> setRepeatMode(AudioServiceRepeatMode repeatMode) async {

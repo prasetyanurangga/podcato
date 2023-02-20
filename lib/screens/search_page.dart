@@ -82,7 +82,7 @@ class _SearchPageState extends State<SearchPage> {
             child: TextField(
               decoration: const InputDecoration(
                 hintStyle: TextStyle(fontSize: 17),
-                hintText: 'Search your trips',
+                hintText: 'Search Podcast',
                 focusColor: Colors.black,
                 suffixIcon: Icon(Icons.search),
                 border: InputBorder.none,

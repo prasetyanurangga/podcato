@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:podcato/audio_services/page_manager.dart';
 import 'package:podcato/audio_services/services/service_locator.dart';
 import 'package:podcato/blocs/detail_podcast/detail_podcast_bloc.dart';
@@ -11,7 +12,9 @@ import 'package:podcato/routers/main_router.dart';
 
 Future<void> main() async {
   await setupServiceLocator();
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('id_ID', null)
+      .then((_) => runApp(const MyApp()));
 }
 
 class MyApp extends StatefulWidget {

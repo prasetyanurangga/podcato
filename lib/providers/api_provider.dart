@@ -82,7 +82,8 @@ class ApiProvider {
     Response response;
 
     try {
-      response = await getDio().get(endpoint, queryParameters: {'id': id});
+      response =
+          await getDio().get(endpoint, queryParameters: {'id': id, 'max': 200});
     } on Error catch (e) {
       throw Exception('Failed to load post $e');
     }
