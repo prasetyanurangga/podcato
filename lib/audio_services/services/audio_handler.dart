@@ -166,20 +166,27 @@ class MyAudioHandler extends BaseAudioHandler {
 
   @override
   Future<void> skipToNext() async {
-    PageManager pageManager = getIt<PageManager>();
-    print(pageManager.currentSongIndex);
-    print(pageManager.bunchOfListItems);
+    PageManager pageManager = getIt<PageManager>(); 
+    if (pageManager.currentSongNotifier.value.extras!['index'] > 0) {
     await pageManager.loadPlaylist(pageManager.bunchOfListItems,
-        pageManager.currentSongIndex.value + 1, "");
-    pageManager.currentSongIndex.value = pageManager.currentSongIndex.value + 1;
+          pageManager.currentSongIndex.value - 1, "");
+      // pageManager.currentSongIndex.value = pageManager.currentSongIndex.value - 1;
+    } else {
+      await _player.stop();
+    }
   }
 
   @override
   Future<void> skipToPrevious() async {
     PageManager pageManager = getIt<PageManager>();
+    if (pageManager.currentSongNotifier.value.extras!['index'] + 1 !=
+        pageManager.bunchOfListItems.length) {
     await pageManager.loadPlaylist(pageManager.bunchOfListItems,
-        pageManager.currentSongIndex.value - 1, "");
-    pageManager.currentSongIndex.value = pageManager.currentSongIndex.value - 1;
+          pageManager.currentSongIndex.value + 1, "");
+      // pageManager.currentSongIndex.value = pageManager.currentSongIndex.value + 1;
+    } else {
+      await _player.stop();
+    }
   }
 
   @override

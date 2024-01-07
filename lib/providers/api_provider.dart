@@ -40,25 +40,45 @@ class ApiProvider {
     return dio;
   }
 
-  Future<Response> searchPodcast(String query) async {
-    String endpoint = "/search/byterm";
+
+  Future<Response> categories() async {
+    String endpoint = "/categories/list";
     Response response;
 
     try {
-      response = await getDio()
-          .get(endpoint, queryParameters: {'q': query, 'lang': 'id'});
+      response = await getDio().get(endpoint);
     } on Error catch (e) {
       throw Exception('Failed to load post $e');
     }
     return response;
   }
 
-  Future<Response> getTrendingPodcast() async {
-    String endpoint = "/podcasts/trending";
+  Future<Response> searchPodcast(String query) async {
+    String endpoint = "/search/bytitle";
     Response response;
 
     try {
-      response = await getDio().get(endpoint, queryParameters: {'lang': 'id'});
+      response = await getDio()
+          .get(endpoint, queryParameters: {'q': query, 'lang': 'en'});
+    } on Error catch (e) {
+      throw Exception('Failed to load post $e');
+    }
+    return response;
+  }
+
+  Future<Response> getTrendingPodcast(String? category) async {
+    String endpoint = "/podcasts/trending";
+    Response response;
+
+    var queryParameters = {'lang': 'en'};
+    if (category != null) {
+      queryParameters['cat'] = category;
+    }
+
+    print(queryParameters);
+
+    try {
+      response = await getDio().get(endpoint, queryParameters: queryParameters);
     } on Error catch (e) {
       throw Exception('Failed to load post $e');
     }

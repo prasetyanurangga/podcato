@@ -18,6 +18,13 @@ class PodcastTrendingSuccess extends PodcastTrendingState {
   const PodcastTrendingSuccess({required this.data});
 }
 
+
+class PodcastTrendingByCategorySuccess extends PodcastTrendingState {
+  final List<Feeds> data;
+
+  const PodcastTrendingByCategorySuccess({required this.data});
+}
+
 class PodcastTrendingFailure extends PodcastTrendingState {
   final String error;
 

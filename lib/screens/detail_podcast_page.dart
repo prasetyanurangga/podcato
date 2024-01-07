@@ -447,6 +447,7 @@ class _DetailPodcastPageState extends State<DetailPodcastPage> {
                                     Expanded(
                                       child: GestureDetector(
                                         onTap: () async {
+                                          print(resFeed[index].enclosureUrl);
                                           if (pageManager.currentSongNotifier
                                                   .value.id !=
                                               resFeed[index].enclosureUrl) {

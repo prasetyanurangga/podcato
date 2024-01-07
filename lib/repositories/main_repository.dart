@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:podcato/models/response_categories_model.dart';
 import 'package:podcato/models/response_detail_podcast_model.dart';
 import 'package:podcato/models/response_episode_model.dart';
 import 'package:podcato/models/response_podcasts_model.dart';
@@ -14,9 +15,6 @@ class MainRepository {
     Response response = await _apiProvider.searchPodcast(query);
     ResponsePodcastModel responseJust =
         ResponsePodcastModel.fromJson(response.data);
-    if (responseJust == null) {
-      return ResponseData.connectivityError();
-    }
 
     if (response.statusCode == 200) {
       return ResponseData.success(responseJust);
@@ -25,13 +23,24 @@ class MainRepository {
     }
   }
 
-  Future<ResponseData> GetTrendingPodcast() async {
-    Response response = await _apiProvider.getTrendingPodcast();
+
+
+  Future<ResponseData> GetCategoriesPodcast() async {
+    Response response = await _apiProvider.categories();
+    ResponseCategoriesModel responseJust =
+        ResponseCategoriesModel.fromJson(response.data);
+
+    if (response.statusCode == 200) {
+      return ResponseData.success(responseJust);
+    } else {
+      return ResponseData.error("Error");
+    }
+  }
+
+  Future<ResponseData> GetTrendingPodcast({String? category}) async {
+    Response response = await _apiProvider.getTrendingPodcast(category);
     ResponsePodcastModel responseJust =
         ResponsePodcastModel.fromJson(response.data);
-    if (responseJust == null) {
-      return ResponseData.connectivityError();
-    }
 
     if (response.statusCode == 200) {
       return ResponseData.success(responseJust);
@@ -44,9 +53,6 @@ class MainRepository {
     Response response = await _apiProvider.getDetailPodcast(id);
     ResponseDetailPodcastModel responseJust =
         ResponseDetailPodcastModel.fromJson(response.data);
-    if (responseJust == null) {
-      return ResponseData.connectivityError();
-    }
 
     if (response.statusCode == 200) {
       return ResponseData.success(responseJust);
@@ -59,9 +65,6 @@ class MainRepository {
     Response response = await _apiProvider.getDetailEpisode(id);
     ResponseEpisodeModel responseJust =
         ResponseEpisodeModel.fromJson(response.data);
-    if (responseJust == null) {
-      return ResponseData.connectivityError();
-    }
 
     if (response.statusCode == 200) {
       return ResponseData.success(responseJust);

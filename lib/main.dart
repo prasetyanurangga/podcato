@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:podcato/audio_services/page_manager.dart';
 import 'package:podcato/audio_services/services/service_locator.dart';
+import 'package:podcato/blocs/categories/categories_bloc.dart';
 import 'package:podcato/blocs/detail_podcast/detail_podcast_bloc.dart';
 import 'package:podcato/blocs/podcast_search/podcast_search_bloc.dart';
 import 'package:podcato/blocs/podcast_trending/podcast_trending_bloc.dart';
@@ -55,6 +56,9 @@ class _MyAppState extends State<MyApp> {
           ),
           BlocProvider<DetailPodcastBloc>(
             create: (context) => DetailPodcastBloc(),
+          ),
+          BlocProvider<CategoriesBloc>(
+            create: (context) => CategoriesBloc(),
           ),
         ],
         child: MaterialApp(

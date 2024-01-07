@@ -24,8 +24,11 @@ class PageManager {
   final _audioHandler = getIt<AudioHandler>();
   List<Items> bunchOfListItems = [];
 
+
   // Events: Calls coming from the UI
   void init(List<Items> episodes, int index, String id) async {
+    print("angga : $index");
+    print("angga : $id");
     await loadPlaylist(episodes, index, id);
     _listenToPlaybackState();
     _listenToCurrentPosition();
@@ -34,10 +37,12 @@ class PageManager {
   }
 
   Future<void> loadPlaylist(List<Items> episodes, int index, String id) async {
+    print(index);
     Items tempEpisodes = episodes[index];
     bunchOfListItems = episodes;
 
     currentSongIndex.value = index;
+    print(tempEpisodes.title);
 
     final currentMediaItem = MediaItem(
       id: tempEpisodes.enclosureUrl ?? id,
@@ -60,15 +65,23 @@ class PageManager {
     _audioHandler.playbackState.listen((playbackState) {
       final isPlaying = playbackState.playing;
       final processingState = playbackState.processingState;
-      if (processingState == AudioProcessingState.loading) {
+      if (processingState == AudioProcessingState.loading ||
+          processingState == AudioProcessingState.buffering) {
         playButtonNotifier.value = ButtonState.loading;
+      } else if (processingState == AudioProcessingState.completed) {
+        print("CIMPLEYEEEE");
+        print(currentSongIndex.value);
+        print(currentSongNotifier.value.extras!['uuid']);
+        print(currentSongNotifier.value.extras!['index']);
+        print(currentSongNotifier.value.title);
+
+        // next(currentSongIndex.value, currentSongNotifier.value.extras!['uuid']);
+        next();
       } else if (!isPlaying) {
         playButtonNotifier.value = ButtonState.paused;
       } else if (processingState != AudioProcessingState.completed) {
         playButtonNotifier.value = ButtonState.playing;
-      } else {
-        _audioHandler.seek(Duration.zero);
-        _audioHandler.pause();
+      
       }
     });
   }
@@ -82,6 +95,7 @@ class PageManager {
         total: oldState.total,
       );
     });
+
   }
 
   void _listenToBufferedPosition() {
@@ -123,27 +137,33 @@ class PageManager {
 
   void seek(Duration position) => _audioHandler.seek(position);
 
-  // Future<void> previous() async {
-  //   _audioHandler.pause();
-  //   _audioHandler.skipToPrevious();
-  // }
-
-  // Future<void> next() async {
-  //   _audioHandler.pause();
-  //   _audioHandler.skipToNext();
-  // }
-
-  Future<void> previous(int index, String id) async {
+  Future<void> previous() async {
     _audioHandler.pause();
-    await loadPlaylist(bunchOfListItems, index - 1, id);
-    currentSongIndex.value = index - 1;
+    _audioHandler.skipToPrevious();
   }
 
-  Future<void> next(int index, String id) async {
+  Future<void> next() async {
     _audioHandler.pause();
-    await loadPlaylist(bunchOfListItems, index + 1, id);
-    currentSongIndex.value = index + 1;
+    _audioHandler.skipToNext();
   }
+
+  // Future<void> next(int index, String id) async {
+  //   _audioHandler.pause();
+  //   if (index > 0) {
+
+  //   await loadPlaylist(bunchOfListItems, index - 1, id);
+  //   currentSongIndex.value = index - 1;
+  //   }
+  // }
+
+  // Future<void> previous(int index, String id) async {
+  //   _audioHandler.pause();
+  //   if (index < bunchOfListItems.length - 1) {
+
+  //   await loadPlaylist(bunchOfListItems, index + 1, id);
+  //   currentSongIndex.value = index + 1;
+  //   }
+  // }
 
   void repeat() {
     repeatButtonNotifier.nextState();

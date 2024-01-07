@@ -92,7 +92,7 @@ class _SearchPageState extends State<SearchPage> {
               onChanged: (value) {
                 if (value == "") {
                   BlocProvider.of<PodcastSearchBloc>(context)
-                      .add(const SearchPodcast(query: "rintik"));
+                      .add(const SearchPodcast(query: "a"));
                 }
               },
               onSubmitted: (value) {

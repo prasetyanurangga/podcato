@@ -7,5 +7,6 @@ abstract class PodcastTrendingEvent extends Equatable {
 }
 
 class GetTrendingPodcast extends PodcastTrendingEvent {
-  const GetTrendingPodcast();
+  final String? category;
+  const GetTrendingPodcast(this.category);
 }

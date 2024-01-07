@@ -32,9 +32,9 @@ class _StackPlayerWrapperState extends State<StackPlayerWrapper> {
     super.initState();
   }
 
-  void handlePlayPause() {
+  void handlePlayPause(bool currentStatus) {
     setState(() {
-      isPlaying = !isPlaying;
+      isPlaying = !currentStatus;
       if (isPlaying) {
         pageManager.play();
         // playAudio();
@@ -235,7 +235,20 @@ class _StackPlayerWrapperState extends State<StackPlayerWrapper> {
                         ValueListenableBuilder<ButtonState>(
                           valueListenable: pageManager.playButtonNotifier,
                           builder: (_, value, __) {
-                            if (value == ButtonState.loading) {
+                            print(value);
+                            if (value == ButtonState.paused) {
+                              return IconButton(
+                                onPressed: () => handlePlayPause(false),
+                                iconSize: 24,
+                                icon: const Icon(Icons.play_arrow),
+                              );
+                            } else if (value == ButtonState.playing) {
+                              return IconButton(
+                                onPressed: () => handlePlayPause(true),
+                                iconSize: 24,
+                                icon: const Icon(Icons.pause),
+                              );
+                            } else {
                               return Container(
                                 margin:
                                     const EdgeInsets.symmetric(horizontal: 12),
@@ -246,19 +259,7 @@ class _StackPlayerWrapperState extends State<StackPlayerWrapper> {
                                   strokeWidth: 1,
                                 ),
                               );
-                            } else if (value == ButtonState.paused) {
-                              return IconButton(
-                                onPressed: handlePlayPause,
-                                iconSize: 24,
-                                icon: const Icon(Icons.play_arrow),
-                              );
-                            } else {
-                              return IconButton(
-                                onPressed: handlePlayPause,
-                                iconSize: 24,
-                                icon: const Icon(Icons.pause),
-                              );
-                            }
+                            } 
                           },
                         ),
                         IconButton(

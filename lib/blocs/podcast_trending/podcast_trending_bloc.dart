@@ -13,8 +13,9 @@ class PodcastTrendingBloc
     on<GetTrendingPodcast>((event, emit) async {
       emit(PodcastTrendingLoading());
       try {
+        print(event.category);
         final ResponseData<dynamic> response =
-            await mainRepository.GetTrendingPodcast();
+            await mainRepository.GetTrendingPodcast(category: event.category);
         var finalResponse = response.data;
         if (response.status == Status.ConnectivityError) {
           emit(const PodcastTrendingFailure(error: ""));
@@ -22,6 +23,7 @@ class PodcastTrendingBloc
         if (response.status == Status.Success) {
           emit(
               PodcastTrendingSuccess(data: finalResponse.feeds as List<Feeds>));
+          
         } else {
           emit(PodcastTrendingFailure(error: response.message ?? "Error"));
         }

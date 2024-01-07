@@ -1,3 +1,4 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,8 @@ class _DetailEpisodePageState extends State<DetailEpisodePage> {
   void initState() {
     // getIt<PageManager>().clearQueue();
     if (pageManager.currentSongNotifier.value.id != widget.id) {
+      print("angga${widget.index}");
+      print("angga${widget.uuid}");
       getIt<PageManager>().init(widget.listEpisode, widget.index, widget.uuid);
       getIt<PageManager>().play();
     }
@@ -184,14 +187,24 @@ class _DetailEpisodePageState extends State<DetailEpisodePage> {
             ),
             SizedBox(
               height: 60,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  PreviousSongButton(index: widget.index, id: widget.id),
-                  const PlayButton(),
-                  NextSongButton(index: widget.index, id: widget.id),
-                ],
-              ),
+              child: ValueListenableBuilder<ButtonState>(
+                  valueListenable: pageManager.playButtonNotifier,
+                  builder: (_, value, __) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        PreviousSongButton(
+                            buttonState: value,
+                            index: widget.index,
+                            id: widget.id),
+                        PlayButton(buttonState: value),
+                        NextSongButton(
+                            buttonState: value,
+                            index: widget.index,
+                            id: widget.id),
+                      ],
+                    );
+                  }),
             ),
           ],
         ),
@@ -232,85 +245,108 @@ class AudioProgressBar extends StatelessWidget {
 class PreviousSongButton extends StatelessWidget {
   final int index;
   final String id;
+  final ButtonState buttonState;
 
-  const PreviousSongButton({Key? key, required this.index, required this.id})
+  const PreviousSongButton(
+      {Key? key,
+      required this.buttonState,
+      required this.index,
+      required this.id})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
     final pageManager = getIt<PageManager>();
-    return ValueListenableBuilder<int>(
-      valueListenable: pageManager.currentSongIndex,
-      builder: (_, currentIndex, __) {
+   
+    return ValueListenableBuilder<MediaItem>(
+      valueListenable: pageManager.currentSongNotifier,
+      builder: (_, currentItem, __) {
+        print("angga extras prev ${currentItem.extras!['index']}");
+        print("angga extras max ${pageManager.bunchOfListItems.length}");
         return IconButton(
           icon: const Icon(Icons.skip_previous),
           onPressed: () {
-            if (currentIndex > 0) {
-              pageManager.previous(currentIndex, id);
-            } else {
-              null;
+            if (currentItem.extras!['index'] + 1 !=
+                    pageManager.bunchOfListItems.length &&
+                buttonState != ButtonState.loading) {
+              pageManager.previous();
             }
+                
           },
         );
+            
       },
     );
   }
 }
 
 class PlayButton extends StatelessWidget {
-  const PlayButton({Key? key}) : super(key: key);
+  final ButtonState buttonState;
+  const PlayButton({Key? key, required this.buttonState}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     final pageManager = getIt<PageManager>();
-    return ValueListenableBuilder<ButtonState>(
-      valueListenable: pageManager.playButtonNotifier,
-      builder: (_, value, __) {
-        switch (value) {
-          case ButtonState.loading:
-            return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 12),
-              width: 32.0,
-              height: 32.0,
-              child: const CircularProgressIndicator(
-                color: Colors.black,
-                strokeWidth: 2,
-              ),
-            );
-          case ButtonState.paused:
-            return IconButton(
-              icon: const Icon(Icons.play_arrow),
-              iconSize: 32.0,
-              onPressed: pageManager.play,
-            );
-          case ButtonState.playing:
-            return IconButton(
-              icon: const Icon(Icons.pause),
-              iconSize: 32.0,
-              onPressed: pageManager.pause,
-            );
-        }
-      },
-    );
+    switch (buttonState) {
+      case ButtonState.loading:
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 12),
+          width: 32.0,
+          height: 32.0,
+          child: const CircularProgressIndicator(
+            color: Colors.black,
+            strokeWidth: 2,
+          ),
+        );
+      case ButtonState.paused:
+        return IconButton(
+          icon: const Icon(Icons.play_arrow),
+          iconSize: 32.0,
+          onPressed: pageManager.play,
+        );
+      case ButtonState.playing:
+        return IconButton(
+          icon: const Icon(Icons.pause),
+          iconSize: 32.0,
+          onPressed: pageManager.pause,
+        );
+      default:
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 12),
+          width: 32.0,
+          height: 32.0,
+          child: const CircularProgressIndicator(
+            color: Colors.black,
+            strokeWidth: 2,
+          ),
+        );
+    }
   }
 }
 
 class NextSongButton extends StatelessWidget {
   final int index;
   final String id;
+  final ButtonState buttonState;
 
-  const NextSongButton({Key? key, required this.index, required this.id})
+  const NextSongButton(
+      {Key? key,
+      required this.buttonState,
+      required this.index,
+      required this.id})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final pageManager = getIt<PageManager>();
-    return ValueListenableBuilder<int>(
-      valueListenable: pageManager.currentSongIndex,
-      builder: (_, currentIndex, __) {
+    return ValueListenableBuilder<MediaItem>(
+      valueListenable: pageManager.currentSongNotifier,
+      builder: (_, currentItem, __) {
+        print("angga extras next ${currentItem.extras!['index']}");
         return IconButton(
           icon: const Icon(Icons.skip_next),
           onPressed: () {
-            if ((currentIndex + 1) < pageManager.bunchOfListItems.length) {
-              pageManager.next(currentIndex, id);
+            if (currentItem.extras!['index'] > 0 &&
+                buttonState != ButtonState.loading) {
+              pageManager.next();
             }
           },
         );
