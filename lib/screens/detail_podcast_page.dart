@@ -84,6 +84,30 @@ class _DetailPodcastPageState extends State<DetailPodcastPage> {
     }
   }
 
+  Widget getCategories() {
+    var categories = widget.detail.categories as Map<String, dynamic>;
+    var listCategories = categories.values.toList();
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: List.generate(listCategories.length, (index) {
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            color: Colors.grey.shade300,
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          child: Text(
+            listCategories[index],
+            style: const TextStyle(
+              color: Colors.black,
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
   String formatedTime(int timeInSecond) {
     if (timeInSecond > 3600) {
       int sec = timeInSecond % 60;
@@ -143,7 +167,7 @@ class _DetailPodcastPageState extends State<DetailPodcastPage> {
         artwork: widget.detail.artwork ?? "",
         child: SingleChildScrollView(
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -191,7 +215,7 @@ class _DetailPodcastPageState extends State<DetailPodcastPage> {
                                   const BorderRadius.all(Radius.circular(30)),
                               child: CachedNetworkImage(
                                 imageUrl:
-                                    resPodcast.artwork! ?? resPodcast.image!,
+                                    resPodcast.artwork!,
                                 width: double.infinity,
                                 fit: BoxFit.cover,
                                 placeholder: (context, url) =>
@@ -239,8 +263,7 @@ class _DetailPodcastPageState extends State<DetailPodcastPage> {
                                 Row(
                                   children: [
                                     CachedNetworkImage(
-                                      imageUrl: resPodcast.artwork! ??
-                                          resPodcast.image!,
+                                      imageUrl: resPodcast.artwork!,
                                       width: 20,
                                       height: 20,
                                       fit: BoxFit.cover,
@@ -295,6 +318,10 @@ class _DetailPodcastPageState extends State<DetailPodcastPage> {
                                     ),
                                   ],
                                 ),
+                                const SizedBox(
+                                  height: 8,
+                                ),
+                                getCategories(),
                                 const SizedBox(
                                   height: 8,
                                 ),

@@ -6,6 +6,7 @@ import 'package:podcato/blocs/detail_podcast/detail_podcast_event.dart';
 import 'package:podcato/blocs/podcast_search/podcast_search_bloc.dart';
 import 'package:podcato/blocs/podcast_search/podcato_search_event.dart';
 import 'package:podcato/blocs/podcast_search/podcato_search_state.dart';
+import 'package:podcato/components/no_data_view.dart';
 import 'package:podcato/routers/main_router.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:transformable_list_view/transformable_list_view.dart';
@@ -106,10 +107,10 @@ class _SearchPageState extends State<SearchPage> {
           const SizedBox(height: 24),
           Expanded(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: BlocBuilder<PodcastSearchBloc, PodcastSearchState>(
                 builder: (context, state) {
-                  if (state is PodcastSearchSuccess) {
+                  if (state is PodcastSearchSuccess && state.data.isNotEmpty) {
                     final resFeed = state.data;
                     return TransformableListView.builder(
                       controller: ScrollController(),
@@ -271,6 +272,9 @@ class _SearchPageState extends State<SearchPage> {
                         itemCount: 6,
                       ),
                     );
+                  } else if (state is PodcastSearchSuccess &&
+                      state.data.isEmpty) {
+                    return const NoDataView();
                   } else {
                     return Container();
                   }

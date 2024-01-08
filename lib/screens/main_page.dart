@@ -6,11 +6,13 @@ import 'package:podcato/blocs/categories/categories_event.dart';
 import 'package:podcato/blocs/categories/categories_state.dart';
 import 'package:podcato/blocs/detail_podcast/detail_podcast_bloc.dart';
 import 'package:podcato/blocs/detail_podcast/detail_podcast_event.dart';
-import 'package:podcato/blocs/podcast_search/podcast_search_bloc.dart';
-import 'package:podcato/blocs/podcast_search/podcato_search_event.dart';
+import 'package:podcato/blocs/episode_random/episode_random_bloc.dart';
+import 'package:podcato/blocs/episode_random/episode_random_event.dart';
+import 'package:podcato/blocs/episode_random/episode_random_state.dart';
 import 'package:podcato/blocs/podcast_trending/podcast_trending_bloc.dart';
 import 'package:podcato/blocs/podcast_trending/podcato_trending_event.dart';
 import 'package:podcato/blocs/podcast_trending/podcato_trending_state.dart';
+import 'package:podcato/components/no_data_view.dart';
 // import 'package:podcato/models/response_detail_podcast_model.dart';
 import 'package:podcato/models/response_podcasts_model.dart';
 import 'package:podcato/routers/main_router.dart';
@@ -31,14 +33,13 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   List<Feeds> resFeedTrending = [];
   bool isLoadingTrending = false;
-  int? currentCategaries;
+  int? currentCategaries = 99999;
 
   @override
   void initState() {
     BlocProvider.of<PodcastTrendingBloc>(context)
         .add(const GetTrendingPodcast(null));
-    BlocProvider.of<PodcastSearchBloc>(context)
-        .add(const SearchPodcast(query: "a"));
+    BlocProvider.of<EpidoseRandomBloc>(context).add(const GetEpisodeRandom());
 
     BlocProvider.of<CategoriesBloc>(context).add(const GetCategories());
 
@@ -99,7 +100,8 @@ class _MainPageState extends State<MainPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -115,39 +117,48 @@ class _MainPageState extends State<MainPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
                   Container(
-                    margin: const EdgeInsets.only(bottom: 16, top: 24),
+                    margin: const EdgeInsets.only(bottom: 16, top: 16),
                     height: 200,
-                    child: BlocBuilder<PodcastSearchBloc, PodcastSearchState>(
+                    child: BlocBuilder<EpidoseRandomBloc, EpidoseRandomState>(
                       builder: (context, state) {
-                        if (state is PodcastSearchSuccess) {
+                        if (state is EpidoseRandomSuccess) {
                           final resFeed = state.data;
                           return ListView.builder(
                             scrollDirection: Axis.horizontal,
                             itemCount: resFeed.length,
                             itemBuilder: (context, index) {
                               var title = "";
-                              var author = "";
+                              var listCategories = [];
                               if (resFeed[index].title != null) {
-                                title = resFeed[index].title!;
+                                title = resFeed[index].feedTitle!;
                               }
 
-                              if (resFeed[index].author != null) {
-                                author = resFeed[index].author!;
-                              }
+                              var categories = resFeed[index].categories
+                                  as Map<String, dynamic>;
+                              listCategories = categories.values.toList();
+
                               var uuid = const Uuid().v4();
                               return GestureDetector(
                                 onTap: () {
                                   BlocProvider.of<DetailPodcastBloc>(context)
                                       .add(GetDetailPodcast(
-                                          id: (resFeed[index].id ?? 0)
+                                          id: (resFeed[index].feedId ?? 0)
                                               .toString()));
                                   Navigator.pushNamed(
                                     context,
                                     '/detail_podcast',
                                     arguments: DetailPodcastArgument(
-                                        resFeed[index], uuid),
+                                        Feeds(
+                                          id: resFeed[index].feedId,
+                                          title: resFeed[index].feedTitle,
+                                          artwork: resFeed[index].feedImage,
+                                          link: resFeed[index].link,
+                                          categories: resFeed[index].categories,
+                                          description:
+                                              resFeed[index].description,
+                                        ),
+                                        uuid),
                                   ).then((value) {
                                     setState(() {});
                                   });
@@ -214,20 +225,22 @@ class _MainPageState extends State<MainPage> {
                                         style: const TextStyle(
                                             fontWeight: FontWeight.w700),
                                       ),
-                                      Text(
-                                        author,
+                                      listCategories.isNotEmpty
+                                          ? Text(
+                                              listCategories[0],
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
                                             fontWeight: FontWeight.w300),
-                                      ),
+                                            )
+                                          : Container(),
                                     ],
                                   ),
                                 ),
                               );
                             },
                           );
-                        } else if (state is PodcastSearchFailure) {
+                        } else if (state is EpidoseRandomFailure) {
                           return Text(state.error);
                         } else if (state is PodcastSearchLoading) {
                           return Shimmer.fromColors(
@@ -313,9 +326,18 @@ class _MainPageState extends State<MainPage> {
                               setState(() {
                                 currentCategaries = state.feed[index].id;
                               }),
-                              BlocProvider.of<PodcastTrendingBloc>(context).add(
+                              if (state.feed[index].id == 99999)
+                                {
+                                  BlocProvider.of<PodcastTrendingBloc>(context)
+                                      .add(const GetTrendingPodcast(null))
+                                }
+                              else
+                                {
+                                  BlocProvider.of<PodcastTrendingBloc>(context)
+                                      .add(
                                   GetTrendingPodcast(
                                       currentCategaries.toString()))
+                                }
                             },
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
@@ -342,6 +364,7 @@ class _MainPageState extends State<MainPage> {
                     ),
                   );
                 }
+
 
                 return Container();
               }),
@@ -452,7 +475,9 @@ class _MainPageState extends State<MainPage> {
                 //       ),
                 //     ),
                 //   )
-                : TransformableSliverList(
+                : resFeedTrending.isEmpty
+                    ? const SliverToBoxAdapter(child: NoDataView())
+                    : TransformableSliverList(
                     getTransformMatrix: getScaleDownMatrix,
                     delegate: SliverChildBuilderDelegate(
                       childCount: resFeedTrending.length,

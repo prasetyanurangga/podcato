@@ -19,12 +19,6 @@ class PodcastTrendingSuccess extends PodcastTrendingState {
 }
 
 
-class PodcastTrendingByCategorySuccess extends PodcastTrendingState {
-  final List<Feeds> data;
-
-  const PodcastTrendingByCategorySuccess({required this.data});
-}
-
 class PodcastTrendingFailure extends PodcastTrendingState {
   final String error;
 

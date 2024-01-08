@@ -5,6 +5,7 @@ import 'package:podcato/audio_services/page_manager.dart';
 import 'package:podcato/audio_services/services/service_locator.dart';
 import 'package:podcato/blocs/categories/categories_bloc.dart';
 import 'package:podcato/blocs/detail_podcast/detail_podcast_bloc.dart';
+import 'package:podcato/blocs/episode_random/episode_random_bloc.dart';
 import 'package:podcato/blocs/podcast_search/podcast_search_bloc.dart';
 import 'package:podcato/blocs/podcast_trending/podcast_trending_bloc.dart';
 import 'package:podcato/providers/api_provider.dart';
@@ -53,6 +54,9 @@ class _MyAppState extends State<MyApp> {
           ),
           BlocProvider<PodcastTrendingBloc>(
             create: (context) => PodcastTrendingBloc(),
+          ),
+          BlocProvider<EpidoseRandomBloc>(
+            create: (context) => EpidoseRandomBloc(),
           ),
           BlocProvider<DetailPodcastBloc>(
             create: (context) => DetailPodcastBloc(),

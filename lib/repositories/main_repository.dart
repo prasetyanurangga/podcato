@@ -61,6 +61,18 @@ class MainRepository {
     }
   }
 
+  Future<ResponseData> GetEpisodeRandom() async {
+    Response response = await _apiProvider.getEpisodeRandom();
+    ResponseEpisodeRandomModel responseJust =
+        ResponseEpisodeRandomModel.fromJson(response.data);
+
+    if (response.statusCode == 200) {
+      return ResponseData.success(responseJust);
+    } else {
+      return ResponseData.error("Error");
+    }
+  }
+
   Future<ResponseData> GetDetailEpisode(String id) async {
     Response response = await _apiProvider.getDetailEpisode(id);
     ResponseEpisodeModel responseJust =

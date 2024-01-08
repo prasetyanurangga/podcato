@@ -97,6 +97,18 @@ class ApiProvider {
     return response;
   }
 
+  Future<Response> getEpisodeRandom() async {
+    String endpoint = "/episodes/random";
+    Response response;
+
+    try {
+      response = await getDio().get(endpoint, queryParameters: {'max': 20});
+    } on Error catch (e) {
+      throw Exception('Failed to load post $e');
+    }
+    return response;
+  }
+
   Future<Response> getDetailEpisode(String id) async {
     String endpoint = "/episodes/byfeedid";
     Response response;

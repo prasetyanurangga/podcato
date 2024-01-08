@@ -70,6 +70,7 @@ class Feed {
   int? episodeCount;
   int? crawlErrors;
   int? parseErrors;
+  Map<String, dynamic>? categories;
   int? locked;
   int? imageUrlHash;
 
@@ -103,6 +104,7 @@ class Feed {
     this.crawlErrors,
     this.parseErrors,
     this.locked,
+    this.categories,
     this.imageUrlHash,
   });
 
@@ -135,6 +137,7 @@ class Feed {
     episodeCount = json['episodeCount'];
     crawlErrors = json['crawlErrors'];
     parseErrors = json['parseErrors'];
+    categories = json['categories'];
     locked = json['locked'];
     imageUrlHash = json['imageUrlHash'];
   }
@@ -168,6 +171,7 @@ class Feed {
     data['chash'] = chash;
     data['episodeCount'] = episodeCount;
     data['crawlErrors'] = crawlErrors;
+    data['categories'] = categories;
     data['parseErrors'] = parseErrors;
     data['locked'] = locked;
     data['imageUrlHash'] = imageUrlHash;

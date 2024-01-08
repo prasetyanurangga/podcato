@@ -20,8 +20,12 @@ class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
           emit(const CategoriesFailure(error: ""));
         }
         if (responseCategories.status == Status.Success) {
+
+          var listCategories =
+              finalResponseCategories.categories as List<Categories>;
+          listCategories.insert(0, Categories(id: 99999, name: "All"));
           emit(CategoriesSuccess(
-              feed: finalResponseCategories.feeds as List<Feeds>));
+              feed: listCategories));
         } else {
           emit(CategoriesFailure(error: responseCategories.message ?? "Error"));
         }

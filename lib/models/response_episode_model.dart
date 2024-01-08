@@ -27,6 +27,36 @@ class ResponseEpisodeModel {
   }
 }
 
+class ResponseEpisodeRandomModel {
+  String? status;
+  List<Items>? episodes;
+  String? description;
+
+  ResponseEpisodeRandomModel({this.status, this.episodes, this.description});
+
+  ResponseEpisodeRandomModel.fromJson(Map<String, dynamic> json) {
+    status = json['status'];
+    if (json['episodes'] != null) {
+      episodes = <Items>[];
+      json['episodes'].forEach((v) {
+        episodes!.add(Items.fromJson(v));
+      });
+    }
+    description = json['description'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status'] = status;
+    if (episodes != null) {
+      data['episodes'] = episodes!.map((v) => v.toJson()).toList();
+    }
+    data['description'] = description;
+    return data;
+  }
+}
+
+
 class Items {
   int? id;
   String? title;
@@ -48,11 +78,13 @@ class Items {
   int? feedItunesId;
   String? feedImage;
   int? feedId;
+  String? feedTitle;
   String? feedLanguage;
   int? feedDead;
   int? feedDuplicateOf;
   String? chaptersUrl;
   String? transcriptUrl;
+  Map<String, dynamic>? categories;
   List<Persons>? persons;
   List<SocialInteract>? socialInteract;
   List<Transcripts>? transcripts;
@@ -79,6 +111,7 @@ class Items {
       this.feedItunesId,
       this.feedImage,
       this.feedId,
+      this.feedTitle,
       this.feedLanguage,
       this.feedDead,
       this.feedDuplicateOf,
@@ -87,6 +120,7 @@ class Items {
       this.persons,
       this.socialInteract,
       this.transcripts,
+      this.categories,
       this.value});
 
   Items.fromJson(Map<String, dynamic> json) {
@@ -110,11 +144,13 @@ class Items {
     feedItunesId = json['feedItunesId'];
     feedImage = json['feedImage'];
     feedId = json['feedId'];
+    feedTitle = json['feedTitle'];
     feedLanguage = json['feedLanguage'];
     feedDead = json['feedDead'];
     feedDuplicateOf = json['feedDuplicateOf'];
     chaptersUrl = json['chaptersUrl'];
     transcriptUrl = json['transcriptUrl'];
+    categories = json['categories'];
     if (json['persons'] != null) {
       persons = <Persons>[];
       json['persons'].forEach((v) {
@@ -158,11 +194,13 @@ class Items {
     data['feedItunesId'] = feedItunesId;
     data['feedImage'] = feedImage;
     data['feedId'] = feedId;
+    data['feedTitle'] = feedTitle;
     data['feedLanguage'] = feedLanguage;
     data['feedDead'] = feedDead;
     data['feedDuplicateOf'] = feedDuplicateOf;
     data['chaptersUrl'] = chaptersUrl;
     data['transcriptUrl'] = transcriptUrl;
+    data['categories'] = categories;
     if (persons != null) {
       data['persons'] = persons!.map((v) => v.toJson()).toList();
     }

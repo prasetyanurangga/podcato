@@ -62,6 +62,8 @@ class Feeds {
   bool? explicit;
   String? podcastGuid;
   int? episodeCount;
+
+  Map<String, dynamic>? categories;
   int? imageUrlHash;
   int? newestItemPubdate;
 
@@ -92,6 +94,7 @@ class Feeds {
       this.locked,
       this.explicit,
       this.podcastGuid,
+      this.categories,
       this.episodeCount,
       this.imageUrlHash,
       this.newestItemPubdate});
@@ -116,6 +119,7 @@ class Feeds {
     itunesId = json['itunesId'];
     generator = json['generator'];
     language = json['language'];
+    categories = json['categories'];
     type = json['type'];
     dead = json['dead'];
     crawlErrors = json['crawlErrors'];
@@ -156,6 +160,7 @@ class Feeds {
     data['locked'] = locked;
     data['explicit'] = explicit;
     data['podcastGuid'] = podcastGuid;
+    data['categories'] = categories;
     data['episodeCount'] = episodeCount;
     data['imageUrlHash'] = imageUrlHash;
     data['newestItemPubdate'] = newestItemPubdate;

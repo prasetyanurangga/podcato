@@ -15,7 +15,7 @@ class CategoriesInitial extends CategoriesState {}
 class CategoriesLoading extends CategoriesState {}
 
 class CategoriesSuccess extends CategoriesState {
-  final List<Feeds> feed;
+  final List<Categories> feed;
 
   const CategoriesSuccess({required this.feed});
 }

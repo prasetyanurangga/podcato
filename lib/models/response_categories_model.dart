@@ -1,18 +1,18 @@
 class ResponseCategoriesModel {
   String? status;
-  List<Feeds>? feeds;
+  List<Categories>? categories;
   int? count;
   String? description;
 
   ResponseCategoriesModel(
-      {this.status, this.feeds, this.count, this.description});
+      {this.status, this.categories, this.count, this.description});
 
   ResponseCategoriesModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
     if (json['feeds'] != null) {
-      feeds = <Feeds>[];
+      categories = <Categories>[];
       json['feeds'].forEach((v) {
-        feeds!.add(Feeds.fromJson(v));
+        categories!.add(Categories.fromJson(v));
       });
     }
     count = json['count'];
@@ -22,8 +22,8 @@ class ResponseCategoriesModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['status'] = status;
-    if (feeds != null) {
-      data['feeds'] = feeds!.map((v) => v.toJson()).toList();
+    if (categories != null) {
+      data['feeds'] = categories!.map((v) => v.toJson()).toList();
     }
     data['count'] = count;
     data['description'] = description;
@@ -31,13 +31,13 @@ class ResponseCategoriesModel {
   }
 }
 
-class Feeds {
+class Categories {
   int? id;
   String? name;
 
-  Feeds({this.id, this.name});
+  Categories({this.id, this.name});
 
-  Feeds.fromJson(Map<String, dynamic> json) {
+  Categories.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
   }
